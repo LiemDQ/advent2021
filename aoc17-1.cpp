@@ -8,39 +8,58 @@ struct Coordinate {
 	int y;
 };
 
-int sumOfAllInts(int n1, int n2 = 1){
+int sumOfAllInts(int n1, int n2 = 0){
 	return (n1+1)*n1/2 - (n2+1)*n2/2;
 }
 
-int get_n_steps(int min_x, int max_x){
-	int n = 0; 
+int getHeightFromVelocity(int initial_y_vel){
+	return sumOfAllInts(initial_y_vel);
+}
+
+bool isInSummationBounds(int min_dist, int max_dist){
+	int n = 1;
 	int val = sumOfAllInts(n);
-	while (val< max_x){
-		val = sumOfAllInts(n);
-		if (val > max_x){
-			return --n; 
+	bool result = false; 
+	while (val <= max_dist){
+		if (val >= min_dist){
+			result = true;
 		}
 		n++;
+		val = sumOfAllInts(n);
 	}
-	return 0;
+	return result;
 }
 
-int highest_y(int n_steps, const int y_min, const int y_max){
-	
-	int y= sumOfAllInts(n_steps);
-	while (n_steps > 0){
-	//check that the probe falls into the zone
-		y = sumOfAllInts(n_steps);
-		int dy1 = y - y_min;
-		int dy2 = y - y_max;
-		if (get_n_steps(dy1, dy2)){
-			return y;
+int getMaximumHeight(int y_min, int y_max, int n_steps){
+	int i = n_steps;
+	int height = getHeightFromVelocity(i);
+	int diff = height - getHeightFromVelocity(i-1);
+	int spacing = y_max - y_min;
+	int result = 0;
+	std::cout << height << std::endl;
+	for (; i <= 1000; i++){
+		
+		height = getHeightFromVelocity(i);
+		if (isInSummationBounds(height - y_max, height - y_min)){
+			result = height;
 		}
-		n_steps--;
+	}
+	return result;
+}
+
+int get_n_steps(int min_x, int max_x){
+	int n = 1; 
+	int val = sumOfAllInts(n);
+
+	while (val< max_x){
+		n++;
+		val = sumOfAllInts(n);
+		if (val > min_x){
+			return n; 
+		}
 	}
 	return 0;
 }
-
 
 int main(int argc, char* argv[]){
 	std::fstream file(argv[1]);
@@ -59,7 +78,7 @@ int main(int argc, char* argv[]){
 
 	int n_steps = get_n_steps(x_min, x_max);
 	std::cout << "n steps: " <<  n_steps << std::endl;
-	int peak_y = highest_y(n_steps, y_min, y_max);
+	int peak_y = getMaximumHeight(y_min, y_max, n_steps);
 	std::cout << "Highest y: " << peak_y << std::endl;
 
 	return 0;
