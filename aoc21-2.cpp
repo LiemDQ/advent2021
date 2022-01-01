@@ -10,39 +10,9 @@
 constexpr int WINNING_SCORE = 21;
 constexpr int BOARD_POSITIONS = 10;
 
-struct Dice {
-    int counter = 0;
-    int current_val = 1;
-
-    int roll(){
-        int result = 0;
-        for (int i = 0; i < 3; i++){
-            result += current_val;
-            current_val++;
-            current_val %= 100;
-            current_val = current_val == 0 ? 100 : current_val;
-        }
-        counter += 3;
-        return result;
-    }
-};
-
 struct Player {
     int id;
     int position;
-    int score = 0;
-    bool hasWon = false;
-    bool play(Dice& dice){
-        int result = dice.roll();
-        int new_position = (position + result) % 10;
-        if (new_position == 0){
-            new_position = 10;
-        }
-        position = new_position;
-        score += position;
-        hasWon = score >= WINNING_SCORE;
-        return hasWon;
-    }
 };
 
 using ScoreRow = std::array<long, WINNING_SCORE>;
